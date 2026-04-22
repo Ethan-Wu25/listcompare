@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <title>List Comparator Tool</title>
+
+  <!-- SEO & Google Ads Friendly -->
+  <meta name="description" content="Compare two lists online. Upload files or paste text. Find differences and similarities instantly.">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Google Ads placeholder script (replace later)
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #6366f1;
+      --red: #ef4444;
+      --blue: #3b82f6;
+      --green: #22c55e;
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #475569;
+      --accent: #4f46e5;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      padding: 24px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin: 0;
+    }
+
+    button {
+      background: var(--accent);
+      border: none;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    button:hover { opacity: 0.9; }
+
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      display: grid;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--card);
+      padding: 18px;
+      border-radius: 14px;
+      box-shadow: 0 12px 30px rgba(0,0,0,.15);
+    }
+
+    .inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 160px;
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--muted);
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    input[type="file"] {
+      margin-top: 8px;
+    }
+
+    .actions {
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .results {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    ul {
+      padding-left: 0;
+      list-style: none;
+    }
+
+    li {
+      padding: 6px 10px;
+      border-radius: 8px;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .onlyA { background: rgba(239,68,68,.15); color: var(--red); }
+    .onlyB { background: rgba(59,130,246,.15); color: var(--blue); }
+    .both  { background: rgba(34,197,94,.15); color: var(--green); }
+    .union { background: rgba(99,102,241,.15); }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 30px;
+    }
+
+    /* Google Ads placeholder */
+    .ads {
+      height: 90px;
+      border: 1px dashed var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+<header>
+  <h1>List Comparator</h1>
+  <button onclick="toggleTheme()">🌙 / ☀️</button>
+</header>
+
+<div class="container">
+
+  <div class="card inputs">
+    <div>
+      <h3>List A</h3>
+      <textarea id="listA"></textarea>
+      <input type="file" accept=".txt" onchange="loadFile(event, 'listA')" />
+    </div>
+
+    <div>
+      <h3>List B</h3>
+      <textarea id="listB"></textarea>
+      <input type="file" accept=".txt" onchange="loadFile(event, 'listB')" />
+    </div>
+  </div>
+
+  <div class="actions">
+    <button onclick="compare()">Compare</button>
+  </div>
+
+  <div class="results">
+    <div class="card">
+      <h3>Only in A</h3>
+      <ul id="onlyA"></ul>
+    </div>
+    <div class="card">
+      <h3>Only in B</h3>
+      <ul id="onlyB"></ul>
+    </div>
+    <div class="card">
+      <h3>Both A & B</h3>
+      <ul id="both"></ul>
+    </div>
+    <div class="card">
+      <h3>A or B</h3>
+      <ul id="union"></ul>
+    </div>
+  </div>
+
+  <div class="ads">
+    Google AdSense Area
+  </div>
+</div>
+
+<footer>
+  Built with pure HTML, CSS & JavaScript
+</footer>
+
+<script>
+  const root = document.documentElement;
+
+  function toggleTheme() {
+    const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = next;
+    localStorage.setItem('theme', next);
+  }
+
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme) root.dataset.theme = savedTheme;
+
+  function loadFile(e, target) {
+    const reader = new FileReader();
+    reader.onload = () => document.getElementById(target).value = reader.result;
+    reader.readAsText(e.target.files[0]);
+  }
+
+  function parse(id) {
+    return [...new Set(
+      document.getElementById(id).value
+        .split('\n')
+        .map(s => s.trim())
+        .filter(Boolean)
+    )];
+  }
+
+  function display(id, list, cls) {
+    const el = document.getElementById(id);
+    el.innerHTML = '';
+    list.forEach(v => {
+      const li = document.createElement('li');
+      li.textContent = v;
+      li.className = cls;
+      el.appendChild(li);
+    });
+  }
+
+  function compare() {
+    const A = parse('listA');
+    const B = parse('listB');
+    const setA = new Set(A);
+    const setB = new Set(B);
+
+    display('onlyA', A.filter(x => !setB.has(x)), 'onlyA');
+    display('onlyB', B.filter(x => !setA.has(x)), 'onlyB');
+    display('both', A.filter(x => setB.has(x)), 'both');
+    display('union', [...new Set([...A, ...B])], 'union');
+  }
+</script>
+</body>
+</html>
